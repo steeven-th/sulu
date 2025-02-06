@@ -21,6 +21,7 @@ use Sulu\Bundle\MediaBundle\Domain\Event\MediaCreatedEvent;
 use Sulu\Bundle\MediaBundle\Domain\Event\MediaModifiedEvent;
 use Sulu\Bundle\MediaBundle\Domain\Event\MediaMovedEvent;
 use Sulu\Bundle\MediaBundle\Domain\Event\MediaRemovedEvent;
+use Sulu\Bundle\MediaBundle\Domain\Event\MediaRemovedNoTrashEvent;
 use Sulu\Bundle\MediaBundle\Domain\Event\MediaTranslationAddedEvent;
 use Sulu\Bundle\MediaBundle\Domain\Event\MediaVersionAddedEvent;
 use Sulu\Bundle\MediaBundle\Domain\Event\MediaVersionRemovedEvent;
@@ -637,8 +638,14 @@ class MediaManager implements MediaManagerInterface
             );
         }
 
+        $mediaEvent = new MediaRemovedEvent($mediaEntity->getId(), $mediaEntity->getCollection()->getId(), $mediaTitle, $locale);
+
         if (null !== $this->trashManager) {
-            $this->trashManager->store(MediaInterface::RESOURCE_KEY, $mediaEntity);
+            try {
+                $this->trashManager->store(MediaInterface::RESOURCE_KEY, $mediaEntity);
+            } catch (\Exception $e) {
+                $mediaEvent = new MediaRemovedNoTrashEvent($mediaEntity->getId(), $mediaEntity->getCollection()->getId(), $mediaTitle, $locale);
+            }
         }
 
         /** @var File $file */
@@ -667,9 +674,7 @@ class MediaManager implements MediaManagerInterface
 
         $this->em->remove($mediaEntity);
 
-        $this->domainEventCollector->collect(
-            new MediaRemovedEvent($mediaEntity->getId(), $collectionId, $mediaTitle, $locale)
-        );
+        $this->domainEventCollector->collect($mediaEvent);
 
         $this->em->flush();
     }
