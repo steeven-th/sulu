@@ -17,7 +17,6 @@ use HandcraftedInTheAlps\RestRoutingBundle\Routing\ClassResourceInterface;
 use Sulu\Bundle\MediaBundle\Admin\MediaAdmin;
 use Sulu\Bundle\MediaBundle\Entity\Collection;
 use Sulu\Bundle\MediaBundle\Entity\CollectionRepositoryInterface;
-use Sulu\Bundle\MediaBundle\Entity\Media;
 use Sulu\Bundle\MediaBundle\Entity\MediaInterface;
 use Sulu\Bundle\MediaBundle\Media\Exception\CollectionNotFoundException;
 use Sulu\Bundle\MediaBundle\Media\Exception\FileNotFoundException;
@@ -29,9 +28,8 @@ use Sulu\Bundle\MediaBundle\Media\Manager\MediaManagerInterface;
 use Sulu\Bundle\MediaBundle\Media\Storage\StorageInterface;
 use Sulu\Component\Media\SystemCollections\SystemCollectionManagerInterface;
 use Sulu\Component\Rest\Exception\EntityNotFoundException;
-use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\Exception\MediaNotFoundException as RestMediaNotFoundException;
-use Sulu\Component\Rest\Exception\ReferencingResourcesFoundException;
+use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\Exception\RestException;
 use Sulu\Component\Rest\ListBuilder\Doctrine\DoctrineListBuilder;
 use Sulu\Component\Rest\ListBuilder\Doctrine\DoctrineListBuilderFactoryInterface;
@@ -506,7 +504,7 @@ class MediaController extends AbstractMediaController implements
         throw new RestMediaNotFoundException(
             [
                 'id' => $id,
-                'resourceKey' => MediaInterface::RESOURCE_KEY
+                'resourceKey' => MediaInterface::RESOURCE_KEY,
             ],
         );
     }
