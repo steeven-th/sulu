@@ -17,8 +17,10 @@ use HandcraftedInTheAlps\RestRoutingBundle\Routing\ClassResourceInterface;
 use Sulu\Bundle\MediaBundle\Admin\MediaAdmin;
 use Sulu\Bundle\MediaBundle\Entity\Collection;
 use Sulu\Bundle\MediaBundle\Entity\CollectionRepositoryInterface;
+use Sulu\Bundle\MediaBundle\Entity\Media;
 use Sulu\Bundle\MediaBundle\Entity\MediaInterface;
 use Sulu\Bundle\MediaBundle\Media\Exception\CollectionNotFoundException;
+use Sulu\Bundle\MediaBundle\Media\Exception\FileNotFoundException;
 use Sulu\Bundle\MediaBundle\Media\Exception\MediaNotFoundException;
 use Sulu\Bundle\MediaBundle\Media\FormatManager\FormatManagerInterface;
 use Sulu\Bundle\MediaBundle\Media\ListBuilderFactory\MediaListBuilderFactory;
@@ -28,6 +30,8 @@ use Sulu\Bundle\MediaBundle\Media\Storage\StorageInterface;
 use Sulu\Component\Media\SystemCollections\SystemCollectionManagerInterface;
 use Sulu\Component\Rest\Exception\EntityNotFoundException;
 use Sulu\Component\Rest\Exception\MissingParameterException;
+use Sulu\Component\Rest\Exception\MediaNotFoundException as RestMediaNotFoundException;
+use Sulu\Component\Rest\Exception\ReferencingResourcesFoundException;
 use Sulu\Component\Rest\Exception\RestException;
 use Sulu\Component\Rest\ListBuilder\Doctrine\DoctrineListBuilder;
 use Sulu\Component\Rest\ListBuilder\Doctrine\DoctrineListBuilderFactoryInterface;
@@ -357,13 +361,17 @@ class MediaController extends AbstractMediaController implements
      *
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction($id, Request $request)
     {
-        $delete = function($id) {
+        $force = $request->query->get('force', false);
+
+        $delete = function($id) use ($force) {
             try {
-                $this->mediaManager->delete($id, true);
+                $this->mediaManager->delete($id, true, $force);
             } catch (MediaNotFoundException $e) {
                 throw new EntityNotFoundException($this->mediaClass, $id, $e); // will throw 404 Entity not found
+            } catch (FileNotFoundException $e) {
+                $this->throwFileNotFoundException($id);
             }
         };
 
@@ -486,5 +494,20 @@ class MediaController extends AbstractMediaController implements
     public function getSecuredObjectId(Request $request)
     {
         return $request->get('collection');
+    }
+
+    /**
+     * Throws a RestMediaNotFoundException.
+     *
+     * @throws RestMediaNotFoundException
+     */
+    private function throwFileNotFoundException(int $id): void
+    {
+        throw new RestMediaNotFoundException(
+            [
+                'id' => $id,
+                'resourceKey' => MediaInterface::RESOURCE_KEY
+            ],
+        );
     }
 }

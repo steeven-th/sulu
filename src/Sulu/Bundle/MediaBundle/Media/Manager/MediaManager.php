@@ -37,6 +37,7 @@ use Sulu\Bundle\MediaBundle\Entity\MediaInterface;
 use Sulu\Bundle\MediaBundle\Entity\MediaRepositoryInterface;
 use Sulu\Bundle\MediaBundle\Media\Exception\CollectionNotFoundException;
 use Sulu\Bundle\MediaBundle\Media\Exception\FileVersionNotFoundException;
+use Sulu\Bundle\MediaBundle\Media\Exception\FileNotFoundException as SuluFileNotFoundException;
 use Sulu\Bundle\MediaBundle\Media\Exception\InvalidFileException;
 use Sulu\Bundle\MediaBundle\Media\Exception\InvalidMediaTypeException;
 use Sulu\Bundle\MediaBundle\Media\Exception\MediaNotFoundException;
@@ -617,7 +618,7 @@ class MediaManager implements MediaManagerInterface
         return $collection;
     }
 
-    public function delete($id, $checkSecurity = false)
+    public function delete($id, $checkSecurity = false, $force = false)
     {
         $mediaEntity = $this->getEntityById($id);
 
@@ -638,13 +639,13 @@ class MediaManager implements MediaManagerInterface
             );
         }
 
-        $mediaEvent = new MediaRemovedEvent($mediaEntity->getId(), $mediaEntity->getCollection()->getId(), $mediaTitle, $locale);
+        $mediaEvent = !$force ? new MediaRemovedEvent($mediaEntity->getId(), $mediaEntity->getCollection()->getId(), $mediaTitle, $locale) : new MediaRemovedNoTrashEvent($mediaEntity->getId(), $mediaEntity->getCollection()->getId(), $mediaTitle, $locale);
 
-        if (null !== $this->trashManager) {
+        if (null !== $this->trashManager && !$force) {
             try {
                 $this->trashManager->store(MediaInterface::RESOURCE_KEY, $mediaEntity);
-            } catch (\Exception $e) {
-                $mediaEvent = new MediaRemovedNoTrashEvent($mediaEntity->getId(), $mediaEntity->getCollection()->getId(), $mediaTitle, $locale);
+            } catch (SuluFileNotFoundException $e) {
+                throw new SuluFileNotFoundException($id);
             }
         }
 
