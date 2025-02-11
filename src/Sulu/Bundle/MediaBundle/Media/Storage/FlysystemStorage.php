@@ -75,7 +75,7 @@ abstract class FlysystemStorage implements StorageInterface
         }
     }
 
-    public function move(array $sourceStorageOptions, array $targetStorageOptions): array
+    public function move(array $sourceStorageOptions, array $targetStorageOptions, ?int $id = null): array
     {
         $this->createDirectories($targetStorageOptions);
 
@@ -85,6 +85,11 @@ abstract class FlysystemStorage implements StorageInterface
         $targetFilePath = $this->getFilePath($targetStorageOptions);
         if ($this->filesystem->has($targetFilePath)) {
             throw new FilenameAlreadyExistsException($targetFilePath);
+        }
+
+        $sourcePath = $this->getPath($sourceStorageOptions);
+        if (!$this->filesystem->has($sourcePath) && null !== $id) {
+            throw new \Sulu\Bundle\MediaBundle\Media\Exception\FileNotFoundException($id);
         }
 
         $this->filesystem->rename($this->getFilePath($sourceStorageOptions), $targetFilePath);

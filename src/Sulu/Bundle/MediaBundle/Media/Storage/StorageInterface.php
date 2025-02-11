@@ -56,13 +56,9 @@ interface StorageInterface
     /**
      * Moves a file on the storage.
      *
-     * @param array<string, string|null> $sourceStorageOptions
-     * @param array<string, string|null> $targetStorageOptions
-     * @param int $id
-     *
      * @return array<string, string|null>
      */
-    public function move(array $sourceStorageOptions, array $targetStorageOptions, int $id): array;
+    public function move(array $sourceStorageOptions, array $targetStorageOptions, ?int $id = null): array;
 
     /**
      * Removes the file from storage.

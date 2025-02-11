@@ -355,8 +355,6 @@ class MediaController extends AbstractMediaController implements
     /**
      * Delete a media with the given id.
      *
-     * @param int $id
-     *
      * @return Response
      */
     public function deleteAction(int $id, Request $request)
