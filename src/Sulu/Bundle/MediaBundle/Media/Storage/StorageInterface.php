@@ -58,10 +58,11 @@ interface StorageInterface
      *
      * @param array<string, string|null> $sourceStorageOptions
      * @param array<string, string|null> $targetStorageOptions
+     * @param int $id
      *
      * @return array<string, string|null>
      */
-    public function move(array $sourceStorageOptions, array $targetStorageOptions): array;
+    public function move(array $sourceStorageOptions, array $targetStorageOptions, int $id): array;
 
     /**
      * Removes the file from storage.

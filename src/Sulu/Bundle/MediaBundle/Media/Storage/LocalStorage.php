@@ -88,7 +88,7 @@ class LocalStorage implements StorageInterface
         return self::TYPE_LOCAL;
     }
 
-    public function move(array $sourceStorageOptions, array $targetStorageOptions): array
+    public function move(array $sourceStorageOptions, array $targetStorageOptions, int $id): array
     {
         $this->createDirectories($targetStorageOptions);
 
@@ -104,8 +104,9 @@ class LocalStorage implements StorageInterface
             throw new FilenameAlreadyExistsException($targetPath);
         }
 
-        if (!$this->filesystem->exists($this->getPath($sourceStorageOptions))) {
-            throw new FileNotFoundException($this->getPath($sourceStorageOptions));
+        $sourcePath = $this->getPath($sourceStorageOptions);
+        if (!$this->filesystem->exists($sourcePath)) {
+            throw new FileNotFoundException($id);
         }
 
         $this->filesystem->rename($this->getPath($sourceStorageOptions), $targetPath);

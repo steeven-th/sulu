@@ -359,7 +359,7 @@ class MediaController extends AbstractMediaController implements
      *
      * @return Response
      */
-    public function deleteAction($id, Request $request)
+    public function deleteAction(int $id, Request $request)
     {
         $force = $request->query->get('force', false);
 

@@ -618,7 +618,11 @@ class MediaManager implements MediaManagerInterface
         return $collection;
     }
 
-    public function delete($id, $checkSecurity = false, $force = false)
+    /**
+     * @throws MediaNotFoundException
+     * @throws SuluFileNotFoundException
+     */
+    public function delete($id, $checkSecurity = false, bool $force = false)
     {
         $mediaEntity = $this->getEntityById($id);
 
