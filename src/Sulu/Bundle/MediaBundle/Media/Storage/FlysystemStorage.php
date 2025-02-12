@@ -16,6 +16,7 @@ use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
 use Sulu\Bundle\MediaBundle\Media\Exception\FilenameAlreadyExistsException;
+use Sulu\Bundle\MediaBundle\Media\Exception\FileNotFoundException as SuluFileNotFoundException;
 use Sulu\Bundle\MediaBundle\Media\Exception\ImageProxyMediaNotFoundException;
 
 abstract class FlysystemStorage implements StorageInterface
@@ -87,9 +88,9 @@ abstract class FlysystemStorage implements StorageInterface
             throw new FilenameAlreadyExistsException($targetFilePath);
         }
 
-        $sourcePath = $this->getPath($sourceStorageOptions);
+        $sourcePath = $this->getFilePath($sourceStorageOptions);
         if (!$this->filesystem->has($sourcePath) && null !== $id) {
-            throw new \Sulu\Bundle\MediaBundle\Media\Exception\FileNotFoundException($id);
+            throw new SuluFileNotFoundException($id);
         }
 
         $this->filesystem->rename($this->getFilePath($sourceStorageOptions), $targetFilePath);

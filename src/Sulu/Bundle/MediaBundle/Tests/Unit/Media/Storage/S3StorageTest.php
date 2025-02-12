@@ -256,6 +256,7 @@ class S3StorageTest extends TestCase
         $flysystem->createDir('trash/1')->shouldBeCalled();
 
         $flysystem->has('trash/1/test.jpg')->wilLReturn(false);
+        $flysystem->has('1/test.jpg')->willReturn(true);
         $flysystem->rename('1/test.jpg', 'trash/1/test.jpg')->shouldBeCalled();
 
         $result = $storage->move(
@@ -284,6 +285,7 @@ class S3StorageTest extends TestCase
         $flysystem->has('trash/1')->wilLReturn(true);
 
         $flysystem->has('trash/1/test.jpg')->wilLReturn(false);
+        $flysystem->has('1/test.jpg')->willReturn(true);
         $flysystem->rename('1/test.jpg', 'trash/1/test.jpg')->shouldBeCalled();
 
         $result = $storage->move(
@@ -307,6 +309,8 @@ class S3StorageTest extends TestCase
         $adapter->getBucket()->willReturn('test');
 
         $storage = new S3Storage($flysystem->reveal(), 1);
+
+        $flysystem->has('1/test.jpg')->willReturn(true);
 
         $flysystem->has('trash')->wilLReturn(true);
         $flysystem->has('trash/1')->wilLReturn(true);
