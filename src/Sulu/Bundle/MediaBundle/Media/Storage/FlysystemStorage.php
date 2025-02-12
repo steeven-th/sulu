@@ -87,7 +87,7 @@ abstract class FlysystemStorage implements StorageInterface
             throw new FilenameAlreadyExistsException($targetFilePath);
         }
 
-        $sourcePath = $this->getPath($sourceStorageOptions);
+        $sourcePath = $this->getFilePath($sourceStorageOptions);
         if (!$this->filesystem->has($sourcePath) && null !== $id) {
             throw new \Sulu\Bundle\MediaBundle\Media\Exception\FileNotFoundException($id);
         }
